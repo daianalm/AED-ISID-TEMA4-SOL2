@@ -1,1 +1,0 @@
-Material A#,100,Estado del Material A

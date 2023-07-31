@@ -51,11 +51,17 @@ begin
         3: materiales[numMateriales + 1].nombreClave := campo;
         4: 
         begin
-          Val(campo, materiales[numMateriales + 1].cantidad, convertResult);
-          if convertResult <> 0 then
+          // Verificamos si el campo cantidad está vacío y lo asumimos como cero.
+          if campo = '' then
+            materiales[numMateriales + 1].cantidad := 0
+          else
           begin
-            Writeln('Error en la cantidad del material ', materiales[numMateriales + 1].nombreClave);
-            Exit; // Terminar el programa si hay un error
+            Val(campo, materiales[numMateriales + 1].cantidad, convertResult);
+            if convertResult <> 0 then
+            begin
+              Writeln('Error en la cantidad del material ', materiales[numMateriales + 1].nombreClave);
+              Exit; // Terminar el programa si hay un error
+            end;
           end;
         end;
         5: materiales[numMateriales + 1].estado := campo;
@@ -114,7 +120,7 @@ var
   i: Integer;
 begin
   // Creamos el archivo de salida.
-  Assign(archivoSalida, 'materiales_tipo_L.txt');
+  Assign(archivoSalida, 'materiales_tipo_L_o_P.txt');
   Rewrite(archivoSalida);
 
   // Recorremos los materiales y escribimos los de tecnología 'L' o 'P' con el código buscado.
@@ -137,16 +143,17 @@ var
 begin
   LeerMateriales();
 
-  // Solicitamos al usuario que ingrese la tecnología a filtrar ('L' o 'P')
-  writeln('Ingrese la tecnología a filtrar (L o P): ');
-  readln(tecnologiaFiltrada);
+  repeat
+    // Solicitamos al usuario que ingrese la tecnología a filtrar ('L' o 'P')
+    writeln('Ingrese la tecnología a filtrar (L o P): ');
+    readln(tecnologiaFiltrada);
 
-  // Validamos que la letra ingresada sea 'L' o 'P'
-  if (tecnologiaFiltrada <> 'L') and (tecnologiaFiltrada <> 'P') then
-  begin
-    writeln('Error: La tecnología ingresada no es válida.');
-    Exit; // Terminar el programa si hay un error
-  end;
+    // Validamos que la letra ingresada sea 'L' o 'P'
+    if (tecnologiaFiltrada <> 'L') and (tecnologiaFiltrada <> 'P') then
+    begin
+      writeln('Error: La tecnología ingresada no es válida. Por favor, ingrese L o P.');
+    end;
+  until (tecnologiaFiltrada = 'L') or (tecnologiaFiltrada = 'P');
 
   // Mostramos los materiales de tecnología 'B' por pantalla
   GenerarSecuenciaSalida('B');
