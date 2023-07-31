@@ -1,4 +1,4 @@
-{$CODEPAGE UTF8}
+ {$CODEPAGE UTF8}
 program XCOMMaterialReport;
 
 const
@@ -55,7 +55,7 @@ begin
           if convertResult <> 0 then
           begin
             Writeln('Error en la cantidad del material ', materiales[numMateriales + 1].nombreClave);
-            Exit; // Terminate the program if there is an error
+            Exit; // Terminar el programa si hay un error
           end;
         end;
         5: materiales[numMateriales + 1].estado := campo;
@@ -79,17 +79,18 @@ begin
   for i := 1 to numMateriales do
   begin
     if (materiales[i].tecnologia = 'L') or (materiales[i].tecnologia = 'P') then
-      writeln('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
-
-    if materiales[i].tecnologia = 'B' then
-      writeln('Material de tecnología B: ', materiales[i].nombreClave);
+      writeln('Código: ', materiales[i].codigo, ', Tecnología: ', materiales[i].tecnologia,
+              ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad)
+    else if materiales[i].tecnologia = 'B' then
+      writeln('Código: ', materiales[i].codigo, ', Tecnología: ', materiales[i].tecnologia,
+              ', Material de tecnología B: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
   end;
 end;
 
+
 procedure InformarCantidadPorTecnologia();
 var
-  i: Integer;
-  cantB, cantL, cantP: Integer;
+  i, cantB, cantL, cantP: Integer;
 begin
   // Inicializamos los contadores a cero.
   cantB := 0;
@@ -136,7 +137,7 @@ end;
 
 // Programa principal
 var
-  codigoBuscado: string[5];
+  codigoBuscado: string;
 begin
   LeerMateriales();
   GenerarSecuenciaSalida();
