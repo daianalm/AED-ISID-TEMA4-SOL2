@@ -2,7 +2,7 @@
 program XCOMMaterialReport;
 
 const
-  MAX_MATERIALS = 1000; // Puedes ajustar este valor.
+  MAX_MATERIALS = 1000; // Se puede ajustar este valor.
 
 type
   Material = record
@@ -144,12 +144,15 @@ begin
   InformarCantidadPorTecnologia();
 
   // Solicitamos el código a buscar en el archivo de salida.
-  writeln('Ingrese el código para el archivo de salida: ');
+  writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
   readln(codigoBuscado);
 
   GenerarArchivoSalida(codigoBuscado);
 
   // Esperamos a que el usuario presione Enter antes de terminar el programa.
   writeln('Presione Enter para salir...');
+  readln;
+  //Mensaje de despedida
+  writeln('GRACIAS');
   readln;
 end.
