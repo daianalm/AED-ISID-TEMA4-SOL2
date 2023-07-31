@@ -1,4 +1,4 @@
- {$CODEPAGE UTF8}
+{$CODEPAGE UTF8}
 program XCOMMaterialReport;
 
 const
@@ -71,22 +71,17 @@ begin
   Close(archivoEntrada);
 end;
 
-procedure GenerarSecuenciaSalida();
+procedure GenerarSecuenciaSalida(tecnologiaFiltrada: Char);
 var
   i: Integer;
 begin
-  writeln('Materiales de tecnología L o P:');
+  writeln('Materiales de tecnología B:');
   for i := 1 to numMateriales do
   begin
-    if (materiales[i].tecnologia = 'L') or (materiales[i].tecnologia = 'P') then
-      writeln('Código: ', materiales[i].codigo, ', Tecnología: ', materiales[i].tecnologia,
-              ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad)
-    else if materiales[i].tecnologia = 'B' then
-      writeln('Código: ', materiales[i].codigo, ', Tecnología: ', materiales[i].tecnologia,
-              ', Material de tecnología B: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
+    if materiales[i].tecnologia = tecnologiaFiltrada then
+      writeln('Código: ', materiales[i].codigo, ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
   end;
 end;
-
 
 procedure InformarCantidadPorTecnologia();
 var
@@ -113,7 +108,7 @@ begin
   writeln('Cantidad de materiales de tecnología P: ', cantP);
 end;
 
-procedure GenerarArchivoSalida(codigoBuscado: string);
+procedure GenerarArchivoSalida(codigoBuscado: string; tecnologiaFiltrada: Char);
 var
   archivoSalida: Text;
   i: Integer;
@@ -122,10 +117,10 @@ begin
   Assign(archivoSalida, 'materiales_tipo_L.txt');
   Rewrite(archivoSalida);
 
-  // Recorremos los materiales y escribimos los de tecnología 'L' con el código buscado.
+  // Recorremos los materiales y escribimos los de tecnología 'L' o 'P' con el código buscado.
   for i := 1 to numMateriales do
   begin
-    if (materiales[i].tecnologia = 'L') and (materiales[i].codigo = codigoBuscado) then
+    if (materiales[i].tecnologia = tecnologiaFiltrada) and (materiales[i].codigo = codigoBuscado) then
       writeln(archivoSalida, materiales[i].nombreClave, ',', materiales[i].cantidad, ',', materiales[i].estado);
   end;
 
@@ -137,17 +132,32 @@ end;
 
 // Programa principal
 var
+  tecnologiaFiltrada: Char; // Variable para almacenar la tecnología a filtrar ('L' o 'P')
   codigoBuscado: string;
 begin
   LeerMateriales();
-  GenerarSecuenciaSalida();
+
+  // Solicitamos al usuario que ingrese la tecnología a filtrar ('L' o 'P')
+  writeln('Ingrese la tecnología a filtrar (L o P): ');
+  readln(tecnologiaFiltrada);
+
+  // Validamos que la letra ingresada sea 'L' o 'P'
+  if (tecnologiaFiltrada <> 'L') and (tecnologiaFiltrada <> 'P') then
+  begin
+    writeln('Error: La tecnología ingresada no es válida.');
+    Exit; // Terminar el programa si hay un error
+  end;
+
+  // Mostramos los materiales de tecnología 'B' por pantalla
+  GenerarSecuenciaSalida('B');
+
+  // Informamos la cantidad de materiales por tecnología
   InformarCantidadPorTecnologia();
 
-  // Solicitamos el código a buscar en el archivo de salida.
-  writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
+  // Generamos el archivo de salida con la tecnología y código buscado
+  writeln('Ingrese el código de "TECNOLOGÍA L" o "TECNOLOGÍA P" para el archivo de salida: ');
   readln(codigoBuscado);
-
-  GenerarArchivoSalida(codigoBuscado);
+  GenerarArchivoSalida(codigoBuscado, tecnologiaFiltrada);
 
   // Esperamos a que el usuario presione Enter antes de terminar el programa.
   writeln('Presione Enter para salir...');
