@@ -1,0 +1,140 @@
+Algoritmo XCOMMaterialReport
+
+// Definición de tipos de datos
+Tipo Material = Registro
+    codigo: Cadena[5]
+    tecnologia: Carácter
+    nombreClave: Cadena[30]
+    cantidad: Entero
+    estado: Cadena[100]
+Fin Tipo Material
+
+// Constantes
+Constante MAX_MATERIALS = 1000 // Puedes ajustar este valor.
+
+// Variables
+Material materiales[MAX_MATERIALS]
+Entero numMateriales
+
+Procedimiento LeerMateriales()
+    Archivo archivoEntrada
+    Cadena linea, campo
+    Entero i, inicioCampo, finCampo, convertResult
+
+    // Abrir el archivo de entrada.
+    archivoEntrada.Abrir("datos_materiales.txt")
+
+    // Inicializar la cantidad de materiales a cero.
+    numMateriales = 0
+
+    // Leer los datos de cada material desde el archivo.
+    Mientras NoEsFinDeArchivo(archivoEntrada) Hacer
+        // Leer una línea del archivo.
+        archivoEntrada.LeerLinea(linea)
+
+        // Dividir la línea en campos usando la coma como delimitador.
+        inicioCampo = 1
+        Para i = 1 Hasta 5 Hacer
+            finCampo = Encontrar(",", linea, inicioCampo)
+            Si finCampo = 0 Entonces
+                finCampo = Longitud(linea) + 1
+            Fin Si
+
+            campo = SubCadena(linea, inicioCampo, finCampo - inicioCampo)
+            Segun i Hacer
+                1: materiales[numMateriales + 1].codigo = campo
+                2: materiales[numMateriales + 1].tecnologia = ConvertirACaracter(campo)
+                3: materiales[numMateriales + 1].nombreClave = campo
+                4: 
+                    Convertir(campo, materiales[numMateriales + 1].cantidad, convertResult)
+                    Si convertResult <> 0 Entonces
+                        Escribir("Error en la cantidad del material ", materiales[numMateriales + 1].nombreClave)
+                        Detener // Termina el programa si hay un error
+                    Fin Si
+                5: materiales[numMateriales + 1].estado = campo
+            Fin Segun
+            inicioCampo = finCampo + 1
+        Fin Para
+
+        // Incrementar la cantidad de materiales.
+        numMateriales = numMateriales + 1
+    Fin Mientras
+
+    // Cerrar el archivo.
+    archivoEntrada.Cerrar()
+Fin Procedimiento LeerMateriales
+
+Procedimiento GenerarSecuenciaSalida()
+    Entero i
+
+    Escribir("Materiales de tecnología L o P:")
+    Para i = 1 Hasta numMateriales Hacer
+        Si materiales[i].tecnologia = 'L' o materiales[i].tecnologia = 'P' Entonces
+            Escribir("Nombre Clave: ", materiales[i].nombreClave, ", Cantidad: ", materiales[i].cantidad)
+
+        Si materiales[i].tecnologia = 'B' Entonces
+            Escribir("Material de tecnología B: ", materiales[i].nombreClave)
+        Fin Si
+    Fin Para
+Fin Procedimiento GenerarSecuenciaSalida
+
+Procedimiento InformarCantidadPorTecnologia()
+    Entero i, cantB, cantL, cantP
+
+    // Inicializamos los contadores a cero.
+    cantB = 0
+    cantL = 0
+    cantP = 0
+
+    // Contamos los materiales de cada tecnología.
+    Para i = 1 Hasta numMateriales Hacer
+        Segun materiales[i].tecnologia Hacer
+            'B': cantB = cantB + 1
+            'L': cantL = cantL + 1
+            'P': cantP = cantP + 1
+        Fin Segun
+    Fin Para
+
+    // Mostramos los resultados por pantalla.
+    Escribir("Cantidad de materiales de tecnología B: ", cantB)
+    Escribir("Cantidad de materiales de tecnología L: ", cantL)
+    Escribir("Cantidad de materiales de tecnología P: ", cantP)
+Fin Procedimiento InformarCantidadPorTecnologia
+
+Procedimiento GenerarArchivoSalida(codigoBuscado: Cadena)
+    Archivo archivoSalida
+    Entero i
+
+    // Creamos el archivo de salida.
+    archivoSalida.Crear("materiales_tipo_L.txt")
+
+    // Recorremos los materiales y escribimos los de tecnología 'L' con el código buscado.
+    Para i = 1 Hasta numMateriales Hacer
+        Si materiales[i].tecnologia = 'L' y materiales[i].codigo = codigoBuscado Entonces
+            archivoSalida.EscribirLinea(materiales[i].nombreClave, ",", materiales[i].cantidad, ",", materiales[i].estado)
+        Fin Si
+    Fin Para
+
+    // Cerramos el archivo.
+    archivoSalida.Cerrar()
+
+    Escribir("Archivo de salida generado correctamente.")
+Fin Procedimiento GenerarArchivoSalida
+
+// Programa principal
+Inicio
+    LeerMateriales()
+    GenerarSecuenciaSalida()
+    InformarCantidadPorTecnologia()
+
+    // Solicitamos el código a buscar en el archivo de salida.
+    Escribir("Ingrese el código para el archivo de salida: ")
+    Leer(codigoBuscado)
+
+    GenerarArchivoSalida(codigoBuscado)
+
+    // Esperamos a que el usuario presione Enter antes de terminar el programa.
+    Escribir("Presione Enter para salir...")
+    LeerLinea()
+Fin
+
