@@ -194,7 +194,7 @@ begin
       continuar := UpCase(continuar);
       if continuar = 'S' then
       begin
-        writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
+        writeln('Ingrese el código 00001 de "TECNOLOGÍA L" para el archivo de salida: ');
         readln(codigoBuscado);
         GenerarArchivoSalida(codigoBuscado);
       end;
@@ -206,14 +206,13 @@ begin
       continuar := UpCase(continuar);
       if continuar = 'S' then
       begin
-        writeln('Ingrese el código para el archivo de salida de tecnología L: ');
+        writeln('Ingrese el código 00001 para el archivo de salida de tecnología L: ');
         readln(codigoBuscado);
         GenerarArchivoSalida(codigoBuscado);
       end;
     end;
 
     //Mensaje de despedida y preguntar si desea continuar
-    writeln('GRACIAS');
     writeln('¿Desea consultar otra tecnología? (S/N)');
     readln(continuar);
     continuar := UpCase(continuar);
