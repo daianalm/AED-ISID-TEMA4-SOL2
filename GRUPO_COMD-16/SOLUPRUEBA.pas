@@ -49,7 +49,7 @@ begin
         1: materiales[numMateriales + 1].codigo := campo;
         2: materiales[numMateriales + 1].tecnologia := UpCase(campo[1]); // Convertir a mayúsculas para evitar problemas con la validación.
         3: materiales[numMateriales + 1].nombreClave := campo;
-        4: 
+        4:
         begin
           // Verificamos si el campo cantidad está vacío y lo asumimos como cero.
           if campo = '' then
@@ -77,18 +77,6 @@ begin
   Close(archivoEntrada);
 end;
 
-procedure GenerarSecuenciaSalida(tecnologiaFiltrada: Char);
-var
-  i: Integer;
-begin
-  writeln('Materiales de tecnología ', tecnologiaFiltrada, ':');
-  for i := 1 to numMateriales do
-  begin
-    if (materiales[i].tecnologia = tecnologiaFiltrada) then
-      writeln('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
-  end;
-end;
-
 procedure MostrarMaterialesTecnologiaB();
 var
   i: Integer;
@@ -98,6 +86,22 @@ begin
   begin
     if materiales[i].tecnologia = 'B' then
       writeln('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
+  end;
+end;
+
+procedure GenerarSecuenciaSalida(tecnologiaFiltrada: Char);
+var
+  i: Integer;
+begin
+  writeln('Materiales de tecnología ', tecnologiaFiltrada, ':');
+  for i := 1 to numMateriales do
+  begin
+    if (materiales[i].tecnologia = tecnologiaFiltrada) then
+    begin
+      writeln('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
+
+      // Aquí puedes agregar cualquier otra acción que quieras realizar con los materiales P o L
+    end;
   end;
 end;
 
@@ -149,6 +153,7 @@ begin
   writeln('Archivo de salida generado correctamente.');
 end;
 
+
 //Programa principal
 var
   codigoBuscado: string;
@@ -181,16 +186,33 @@ begin
     // Informamos la cantidad de materiales por tecnología
     InformarCantidadPorTecnologia();
 
-    // Generamos el archivo de salida con el código de "TECNOLOGÍA L"
-    if tecnologiaFiltrada = 'L' then
+    // Generamos el archivo de salida con el código de "TECNOLOGÍA L" si se ingresó la tecnología 'P'
+    if tecnologiaFiltrada = 'P' then
     begin
-      writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
-      readln(codigoBuscado);
-      GenerarArchivoSalida(codigoBuscado);
+      writeln('¿Desea generar el archivo de tecnología L? (S/N)');
+      readln(continuar);
+      continuar := UpCase(continuar);
+      if continuar = 'S' then
+      begin
+        writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
+        readln(codigoBuscado);
+        GenerarArchivoSalida(codigoBuscado);
+      end;
+    end
+    else if tecnologiaFiltrada = 'L' then
+    begin
+      writeln('¿Desea generar el archivo de tecnología L? (S/N)');
+      readln(continuar);
+      continuar := UpCase(continuar);
+      if continuar = 'S' then
+      begin
+        writeln('Ingrese el código para el archivo de salida de tecnología L: ');
+        readln(codigoBuscado);
+        GenerarArchivoSalida(codigoBuscado);
+      end;
     end;
 
-    
-  //Mensaje de despedida y preguntar si desea continuar
+    //Mensaje de despedida y preguntar si desea continuar
     writeln('GRACIAS');
     writeln('¿Desea consultar otra tecnología? (S/N)');
     readln(continuar);

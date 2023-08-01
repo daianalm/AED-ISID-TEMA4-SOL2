@@ -1,172 +1,195 @@
-ALGORITMO XCOMMaterialReport
+Algoritmo XCOMMaterialReport
 
-    // Constante
-    CONST
-        MAX_MATERIALS = 1000; // Se puede ajustar este valor.
+// Declaración de constantes y tipos de datos
+const
+  MAX_MATERIALS = 1000
 
-    // Tipo de registro
-    TIPO
-        Material = REGISTRO
-            codigo: CADENA[5];
-            tecnologia: CARACTER;
-            nombreClave: CADENA[30];
-            cantidad: ENTERO;
-            estado: CADENA[100];
-        FIN REGISTRO
+tipo
+  Material = Registro
+    codigo: cadena(5)
+    tecnologia: caracter
+    nombreClave: cadena(30)
+    cantidad: entero
+    estado: cadena(100)
+  Fin_Registro
 
-    // Declaración de variables
-    VARIABLES
-        materiales: ARREGLO[1..MAX_MATERIALS] DE Material;
-        numMateriales: ENTERO;
-        archivoEntrada: ARCHIVO DE TEXTO;
-        linea, campo: CADENA;
-        i, inicioCampo, finCampo, convertResult: ENTERO;
-        tecnologiaFiltrada: CARACTER;
-        codigoBuscado: CADENA;
+arreglo
+  materiales: [1..MAX_MATERIALS] de Material
+  cantidadMateriales: entero // Cambio de "numMateriales" a "cantidadMateriales"
 
-    // Procedimiento para leer los materiales desde el archivo de entrada
-    PROCEDIMIENTO LeerMateriales();
-    INICIO
-        // Abrir el archivo de entrada.
-        ASIGNAR(archivoEntrada, 'datos_materiales.txt');
-        RESET(archivoEntrada);
+// Acción para leer los materiales desde el archivo
+Accion LeerMateriales()
+  archivoEntrada: Texto
+  linea, campo: cadena
+  i, inicioCampo, finCampo, convertResult, cantidadCampos: entero // Cambio de "numMateriales" a "cantidadMateriales"
+Principio
+  // Abrir el archivo de entrada
+  Asignar(archivoEntrada, 'datos_materiales.txt')
+  Abrir(archivoEntrada, Lectura)
 
-        // Inicializar la cantidad de materiales a cero.
-        numMateriales := 0;
+  // Inicializar la cantidad de materiales a cero
+  cantidadMateriales := 0 // Cambio de "numMateriales" a "cantidadMateriales"
 
-        // Leer los datos de cada material desde el archivo.
-        REPETIR
-            // Leer una línea del archivo.
-            LEERLINEA(archivoEntrada, linea);
+  // Leer los datos de cada material desde el archivo
+  Mientras no EsFinal(archivoEntrada) Hacer
+    // Leer una línea del archivo
+    LeerLinea(archivoEntrada, linea)
 
-            // Dividir la línea en campos usando la coma como delimitador.
-            inicioCampo := 1;
-            PARA i DESDE 1 HASTA 5 HACER
-                finCampo := POS(',', linea, inicioCampo);
-                SI finCampo = 0 ENTONCES
-                    finCampo := LONGITUD(linea) + 1;
-                FIN SI
+    // Dividir la línea en campos usando la coma como delimitador
+    inicioCampo := 1
+    cantidadCampos := 5 // Variable para contar la cantidad de campos en la línea
+    Para i := 1 Hasta cantidadCampos Hacer
+      finCampo := Encontrar(',', linea, inicioCampo)
+      Si finCampo = 0 Entonces
+        finCampo := Longitud(linea) + 1
 
-                campo := SUBCADENA(linea, inicioCampo, finCampo - inicioCampo);
-                CASO i HACER
-                    1: materiales[numMateriales + 1].codigo := campo;
-                    2: materiales[numMateriales + 1].tecnologia := PRIMERCARACTER(campo);
-                    3: materiales[numMateriales + 1].nombreClave := campo;
-                    4: 
-                    INICIO
-                        // Verificamos si el campo cantidad está vacío y lo asumimos como cero.
-                        SI campo = '' ENTONCES
-                            materiales[numMateriales + 1].cantidad := 0;
-                        SINO
-                            VAL(campo, materiales[numMateriales + 1].cantidad, convertResult);
-                            SI convertResult <> 0 ENTONCES
-                                ESCRIBIR('Error en la cantidad del material ', materiales[numMateriales + 1].nombreClave);
-                                SALIR; // Terminar el programa si hay un error
-                            FIN SI
-                        FIN SI
-                    FIN;
-                    5: materiales[numMateriales + 1].estado := campo;
-                FIN CASO
-                inicioCampo := finCampo + 1;
-            FIN PARA
+      campo := Subcadena(linea, inicioCampo, finCampo - inicioCampo)
+      Segun i Hacer
+        1:
+          materiales[cantidadMateriales + 1].codigo := campo
+        2:
+          materiales[cantidadMateriales + 1].tecnologia := Mayusculas(campo[1]) // Convertir a mayúsculas para evitar problemas con la validación
+        3:
+          materiales[cantidadMateriales + 1].nombreClave := campo
+        4:
+          // Verificamos si el campo cantidad está vacío y lo asumimos como cero
+          Si campo = '' Entonces
+            materiales[cantidadMateriales + 1].cantidad := 0
+          Sino
+            Val(campo, materiales[cantidadMateriales + 1].cantidad, convertResult)
+            Si convertResult <> 0 Entonces
+              Escribir('Error en la cantidad del material ', materiales[cantidadMateriales + 1].nombreClave)
+              Salir // Terminar el programa si hay un error
+            FinSi
+          FinSi
+        5:
+          materiales[cantidadMateriales + 1].estado := campo
+      FinSegun
+      inicioCampo := finCampo + 1
+    FinPara
 
-            // Incrementar la cantidad de materiales.
-            numMateriales := numMateriales + 1;
-        HASTA FINARCHIVO(archivoEntrada);
+    // Incrementar la cantidad de materiales
+    cantidadMateriales := cantidadMateriales + 1
+  FinMientras
 
-        // Cerrar el archivo.
-        CERRAR(archivoEntrada);
-    FIN PROCEDIMIENTO
+  // Cerrar el archivo
+  Cerrar(archivoEntrada)
+FinAccion
 
-    // Procedimiento para generar la secuencia de salida filtrando por tecnología
-    PROCEDIMIENTO GenerarSecuenciaSalida(tecnologiaFiltrada: CARACTER);
-    INICIO
-        ESCRIBIR('Materiales de tecnología B:');
-        PARA i DESDE 1 HASTA numMateriales HACER
-            SI materiales[i].tecnologia = tecnologiaFiltrada ENTONCES
-                ESCRIBIR('Código: ', materiales[i].codigo, ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
-            FIN SI
-        FIN PARA
-    FIN PROCEDIMIENTO
+// Acción para generar la secuencia de salida de acuerdo a la tecnología filtrada
+Accion GenerarSecuenciaSalida(tecnologiaFiltrada: caracter)
+  i: entero
+Principio
+  Escribir('Materiales de tecnología ', tecnologiaFiltrada, ':')
+  Para i := 1 Hasta cantidadMateriales Hacer // Cambio de "numMateriales" a "cantidadMateriales"
+    Si materiales[i].tecnologia = tecnologiaFiltrada Entonces
+      Escribir('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad)
+    FinSi
+  FinPara
+FinAccion
 
-    // Procedimiento para informar la cantidad de materiales por tecnología
-    PROCEDIMIENTO InformarCantidadPorTecnologia();
-    INICIO
-        // Inicializamos los contadores a cero.
-        ENTERO cantB := 0;
-        ENTERO cantL := 0;
-        ENTERO cantP := 0;
 
-        // Contamos los materiales de cada tecnología.
-        PARA i DESDE 1 HASTA numMateriales HACER
-            CASO materiales[i].tecnologia HACER
-                'B': cantB := cantB + 1;
-                'L': cantL := cantL + 1;
-                'P': cantP := cantP + 1;
-            FIN CASO
-        FIN PARA
+// Acción para mostrar los materiales de tecnología B
+Accion MostrarMaterialesTecnologiaB()
+  i: entero
+Principio
+  Escribir('Materiales de tecnología B:')
+  Para i := 1 Hasta numMateriales Hacer
+    Si materiales[i].tecnologia = 'B' Entonces
+      Escribir('Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad)
+    FinSi
+  FinPara
+FinAccion
 
-        // Mostramos los resultados por pantalla.
-        ESCRIBIR('Cantidad de materiales de tecnología B: ', cantB);
-        ESCRIBIR('Cantidad de materiales de tecnología L: ', cantL);
-        ESCRIBIR('Cantidad de materiales de tecnología P: ', cantP);
-    FIN PROCEDIMIENTO
+// Acción para informar la cantidad de materiales por tecnología
+Accion InformarCantidadPorTecnologia()
+  i, cantB, cantL, cantP: entero
+Principio
+  // Inicializamos los contadores a cero
+  cantB := 0
+  cantL := 0
+  cantP := 0
 
-    // Procedimiento para generar el archivo de salida filtrando por tecnología y código buscado
-    PROCEDIMIENTO GenerarArchivoSalida(codigoBuscado: CADENA; tecnologiaFiltrada: CARACTER);
-    INICIO
-        ARCHIVO DE TEXTO archivoSalida;
+  // Contamos los materiales de cada tecnología
+  Para i := 1 Hasta numMateriales Hacer
+    Segun materiales[i].tecnologia Hacer
+      'B': cantB := cantB + 1
+      'L': cantL := cantL + 1
+      'P': cantP := cantP + 1
+    FinSegun
+  FinPara
 
-        // Creamos el archivo de salida.
-        ASIGNAR(archivoSalida, 'materiales_tipo_L_o_P.txt');
-        REESCRIBIR(archivoSalida);
+  // Mostramos los resultados por pantalla
+  Escribir('Cantidad de materiales de tecnología B: ', cantB)
+  Escribir('Cantidad de materiales de tecnología L: ', cantL)
+  Escribir('Cantidad de materiales de tecnología P: ', cantP)
+FinAccion
 
-        // Recorremos los materiales y escribimos los de tecnología 'L' o 'P' con el código buscado.
-        PARA i DESDE 1 HASTA numMateriales HACER
-            SI (materiales[i].tecnologia = tecnologiaFiltrada) Y (materiales[i].codigo = codigoBuscado) ENTONCES
-                ESCRIBIR(archivoSalida, materiales[i].nombreClave, ',', materiales[i].cantidad, ',', materiales[i].estado);
-            FIN SI
-        FIN PARA
+// Acción para generar el archivo de salida
+Accion GenerarArchivoSalida(codigoBuscado: cadena)
+  archivoSalida: Texto
+  i: entero
+Principio
+  Asignar(archivoSalida, 'materiales_tipo_L.txt')
+  Reescribir(archivoSalida)
 
-        // Cerramos el archivo.
-        CERRAR(archivoSalida);
+  Para i := 1 Hasta numMateriales Hacer
+    Si (materiales[i].tecnologia = 'L') y (materiales[i].codigo = codigoBuscado) Entonces
+      Escribir(archivoSalida, 'Nombre Clave: ', materiales[i].nombreClave)
+      Escribir(archivoSalida, 'Cantidad: ', materiales[i].cantidad)
+      Escribir(archivoSalida, 'Estado: ', materiales[i].estado)
+      Escribir(archivoSalida, '-------------------')
+    FinSi
+  FinPara
 
-        ESCRIBIR('Archivo de salida generado correctamente.');
-    FIN PROCEDIMIENTO
+  Cerrar(archivoSalida)
+  Escribir('Archivo de salida generado correctamente.')
+FinAccion
 
-    // Programa principal
-    PROCESO Principal
-    INICIO
-        LeerMateriales();
+//Programa principal
+Principio
+  caracter codigoBuscado
+  caracter tecnologiaFiltrada, continuar
 
-        REPETIR
-            // Solicitamos al usuario que ingrese la tecnología a filtrar ('L' o 'P')
-            ESCRIBIR('Ingrese la tecnología a filtrar (L o P): ');
-            LEER(tecnologiaFiltrada);
+  Repetir
+    LeerMateriales()
 
-            // Validamos que la letra ingresada sea 'L' o 'P'
-            SI (tecnologiaFiltrada <> 'L') Y (tecnologiaFiltrada <> 'P') ENTONCES
-                ESCRIBIR('Error: La tecnología ingresada no es válida. Por favor, ingrese L o P.');
-            FIN SI
-        HASTA (tecnologiaFiltrada = 'L') O (tecnologiaFiltrada = 'P');
+    // Solicitamos al usuario que ingrese la tecnología 'P' o 'L'
+    Repetir
+      Escribir('Ingrese la tecnología a filtrar (P o L): ')
+      LeerLn(tecnologiaFiltrada)
 
-        // Mostramos los materiales de tecnología 'B' por pantalla
-        GenerarSecuenciaSalida('B');
+      // Validamos que solo se haya ingresado la letra 'P' o 'L'
+      tecnologiaFiltrada := Mayusculas(tecnologiaFiltrada) // Convertimos a mayúscula para evitar problemas con la validación
 
-        // Informamos la cantidad de materiales por tecnología
-        InformarCantidadPorTecnologia();
+      Si (tecnologiaFiltrada <> 'P') y (tecnologiaFiltrada <> 'L') Entonces
+        Escribir('Error: La tecnología ingresada no es válida. Por favor, ingrese P o L.')
+      FinSi
+    Hasta (tecnologiaFiltrada = 'P') o (tecnologiaFiltrada = 'L')
 
-        // Generamos el archivo de salida con la tecnología y código buscado
-        ESCRIBIR('Ingrese el código de "TECNOLOGÍA L" o "TECNOLOGÍA P" para el archivo de salida: ');
-        LEER(codigoBuscado);
-        GenerarArchivoSalida(codigoBuscado, tecnologiaFiltrada);
+    // Mostramos los materiales de tecnología 'B' por pantalla
+    MostrarMaterialesTecnologiaB()
 
-        // Esperamos a que el usuario presione Enter antes de terminar el programa.
-        ESCRIBIR('Presione Enter para salir...');
-        LEER;
-        //Mensaje de despedida
-        ESCRIBIR('GRACIAS');
-        LEER;
-    FIN PROCESO
+    // Mostramos los materiales de tecnología 'P' o 'L' por pantalla
+    GenerarSecuenciaSalida(tecnologiaFiltrada)
 
-FIN ALGORITMO
+    // Informamos la cantidad de materiales por tecnología
+    InformarCantidadPorTecnologia()
+
+    // Generamos el archivo de salida con el código de "TECNOLOGÍA L"
+    Si tecnologiaFiltrada = 'L' Entonces
+      Escribir('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ')
+      LeerLn(codigoBuscado)
+      GenerarArchivoSalida(codigoBuscado)
+    FinSi
+
+    //Mensaje de despedida y preguntar si desea continuar
+    Escribir('GRACIAS')
+    Escribir('¿Desea consultar otra tecnología? (S/N)')
+    LeerLn(continuar)
+    continuar := Mayusculas(continuar)
+  Hasta continuar <> 'S'
+
+  // Mensaje de despedida final
+  Escribir('¡Hasta luego!')
+FinAlgoritmo

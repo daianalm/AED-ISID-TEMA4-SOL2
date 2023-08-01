@@ -1,4 +1,4 @@
 Nombre Clave: Material A#
 Cantidad: 100
-Estado: Estado del Material A
+Estado: Estado del Material A |DISPONIBLE|
 -------------------
