@@ -2,7 +2,7 @@
 program XCOMMaterialReport;
 
 const
-  MAX_MATERIALS = 1000; // Puedes ajustar este valor.
+  MAX_MATERIALS = 1000; // Puedes ajustar este valor según tus necesidades.
 
 type
   Material = record
@@ -47,7 +47,7 @@ begin
       campo := Copy(linea, inicioCampo, finCampo - inicioCampo);
       case i of
         1: materiales[numMateriales + 1].codigo := campo;
-        2: materiales[numMateriales + 1].tecnologia := campo[1];
+        2: materiales[numMateriales + 1].tecnologia := UpCase(campo[1]); // Convertir a mayúsculas para evitar problemas con la validación.
         3: materiales[numMateriales + 1].nombreClave := campo;
         4: 
         begin
@@ -81,17 +81,22 @@ procedure GenerarSecuenciaSalida(tecnologiaFiltrada: Char);
 var
   i: Integer;
 begin
+  writeln('Materiales de tecnología ', tecnologiaFiltrada, ':');
+  for i := 1 to numMateriales do
+  begin
+    if materiales[i].tecnologia = tecnologiaFiltrada then
+      writeln('Código: ', materiales[i].codigo, ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
+  end;
+end;
+
+procedure MostrarMaterialesTecnologiaB();
+var
+  i: Integer;
+begin
   writeln('Materiales de tecnología B:');
   for i := 1 to numMateriales do
   begin
     if materiales[i].tecnologia = 'B' then
-      writeln('Código: ', materiales[i].codigo, ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
-  end;
-
-  writeln('Materiales de tecnología L - P:');
-  for i := 1 to numMateriales do
-  begin
-    if (materiales[i].tecnologia = 'L') or (materiales[i].tecnologia = 'P') then
       writeln('Código: ', materiales[i].codigo, ', Nombre Clave: ', materiales[i].nombreClave, ', Cantidad: ', materiales[i].cantidad);
   end;
 end;
@@ -132,13 +137,17 @@ begin
   for i := 1 to numMateriales do
   begin
     if (materiales[i].tecnologia = 'L') and (materiales[i].codigo = codigoBuscado) then
-      writeln(archivoSalida, materiales[i].nombreClave, ',', materiales[i].cantidad, ',', materiales[i].estado);
+    begin
+      writeln(archivoSalida, 'Nombre Clave: ', materiales[i].nombreClave);
+      writeln(archivoSalida, 'Cantidad: ', materiales[i].cantidad);
+      writeln(archivoSalida, 'Estado: ', materiales[i].estado);
+      writeln(archivoSalida, '-------------------');
+    end;
   end;
 
   Close(archivoSalida);
   writeln('Archivo de salida generado correctamente.');
 end;
-
 
 //Programa principal
 var
@@ -147,32 +156,37 @@ var
 begin
   LeerMateriales();
 
+  // Solicitamos al usuario que ingrese la tecnología 'P' o 'L'
   repeat
-    // Solicitamos al usuario que ingrese la tecnología 'L'
-    writeln('Ingrese la tecnología a filtrar (L): ');
+    writeln('Ingrese la tecnología a filtrar (P o L): ');
     readln(tecnologiaFiltrada);
 
-    // Validamos que solo se haya ingresado la letra 'L'
-    if (tecnologiaFiltrada <> 'L') then
+    // Validamos que solo se haya ingresado la letra 'P' o 'L'
+    tecnologiaFiltrada := UpCase(tecnologiaFiltrada); // Convertimos a mayúscula para evitar problemas con la validación.
+
+    if (tecnologiaFiltrada <> 'P') and (tecnologiaFiltrada <> 'L') then
     begin
-      writeln('Error: La tecnología ingresada no es válida. Por favor, ingrese L.');
+      writeln('Error: La tecnología ingresada no es válida. Por favor, ingrese P o L.');
     end;
-  until (tecnologiaFiltrada = 'L');
+  until (tecnologiaFiltrada = 'P') or (tecnologiaFiltrada = 'L');
 
   // Mostramos los materiales de tecnología 'B' por pantalla
+  MostrarMaterialesTecnologiaB();
+
+  // Mostramos los materiales de tecnología 'P' o 'L' por pantalla
   GenerarSecuenciaSalida(tecnologiaFiltrada);
 
   // Informamos la cantidad de materiales por tecnología
   InformarCantidadPorTecnologia();
 
   // Generamos el archivo de salida con el código de "TECNOLOGÍA L"
-  writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
-  readln(codigoBuscado);
-  GenerarArchivoSalida(codigoBuscado);
+  if tecnologiaFiltrada = 'L' then
+  begin
+    writeln('Ingrese el código de "TECNOLOGÍA L" para el archivo de salida: ');
+    readln(codigoBuscado);
+    GenerarArchivoSalida(codigoBuscado);
+  end;
 
-  // Esperamos a que el usuario presione Enter antes de terminar el programa.
-  writeln('Presione Enter para salir...');
-  readln;
   //Mensaje de despedida
   writeln('GRACIAS');
   readln;
