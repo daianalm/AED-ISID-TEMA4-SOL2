@@ -1,4 +1,3 @@
 00001,L,Material A#,100,Estado del Material A |DISPONIBLE|
 00003,P,Material C#,200,Estado del Material C  |DISPONIBLE|
 00002,B,Material B#,50,Estado del Material B |DISPONIBLE|
-
